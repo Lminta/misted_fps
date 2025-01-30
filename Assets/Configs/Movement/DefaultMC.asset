@@ -1,0 +1,25 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: db906376efd64e288410deafec105e46, type: 3}
+  m_Name: DefaultMC
+  m_EditorClassIdentifier: 
+  WalkSpeed: 5
+  RunMultiplier: 2
+  AirControl: 0.5
+  JumpHeight: 1.5
+  Gravity: -9.81
+  JumpCooldown: 0.2
+  MouseSensitivity: 100
+  InvertY: 0
+  VerticalLookLimits: {x: -90, y: 90}
+  GroundCheckRadius: 0.4
+  GroundCheckOffset: 0.1

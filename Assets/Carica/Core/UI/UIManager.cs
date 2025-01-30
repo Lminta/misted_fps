@@ -1,6 +1,6 @@
 using System.Threading;
 using System.Threading.Tasks;
-using Carica.Core.AssetManagement;
+using Carica.Core.Services.AssetManagement;
 using UnityEngine;
 using Zenject;
 

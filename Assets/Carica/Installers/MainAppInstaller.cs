@@ -1,7 +1,8 @@
-using Carica.AssetManagement;
-using Carica.Core.AssetManagement;
+using Carica.Core.Services.AssetManagement;
 using Carica.Core.UI;
+using Fog.Services.Input;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using Zenject;
 
 namespace Carica.Installers
@@ -15,6 +16,7 @@ namespace Carica.Installers
             BindCustomFactories();
             BindServices();
             BindGOs();
+            BindControls();
         }
 
         private void BindGOs()
@@ -36,9 +38,21 @@ namespace Carica.Installers
             Container.BindInterfacesAndSelfTo<UIManager>()
                 .AsSingle()
                 .NonLazy();
+            Container.BindInterfacesAndSelfTo<SceneManager>()
+                .AsSingle()
+                .NonLazy();
         }
 
-        void BindCustomFactories()
+        private void BindControls()
+        {
+#if UNITY_EDITOR || UNITY_WEBGL
+            Container.BindInterfacesAndSelfTo<PCControls>()
+                .AsSingle()
+                .NonLazy();
+#endif
+        }
+
+        private void BindCustomFactories()
         {
             Container.BindInterfacesAndSelfTo<ScreenFactory>().AsSingle().NonLazy();
         }
