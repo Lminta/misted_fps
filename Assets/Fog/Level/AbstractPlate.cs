@@ -25,7 +25,7 @@ namespace Fog.Level
             _coordinates = coordinates;
         }
 
-        private void Start()
+        protected virtual void Start()
         {
             _border.OnTriggerStayEvent += OnBorderStay;
             _border.OnTriggerExitEvent += OnBorderExit;

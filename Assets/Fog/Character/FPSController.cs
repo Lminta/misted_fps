@@ -8,7 +8,7 @@ namespace Fog.Character
     public class FPSPlayerController : MonoBehaviour
     {
         [Header("References")] 
-        [SerializeField] private Transform _playerCamera;
+        [SerializeField] private Camera _playerCamera;
         [SerializeField] private AbstractGroundChecker _groundCheck;
         [SerializeField] private CharacterController _controller;
         [SerializeField] private MovementConfig _movementConfig;
@@ -60,7 +60,7 @@ namespace Fog.Character
                 _movementConfig.VerticalLookLimits.y
             );
 
-            _playerCamera.localRotation = Quaternion.Euler(_xRotation, 0f, 0f);
+            _playerCamera.transform.localRotation = Quaternion.Euler(_xRotation, 0f, 0f);
             transform.Rotate(Vector3.up * look.x);
         }
 

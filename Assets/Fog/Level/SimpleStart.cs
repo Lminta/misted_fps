@@ -1,18 +1,11 @@
-﻿using UnityEngine;
-
-namespace Fog.Level
+﻿namespace Fog.Level
 {
     public class SimpleStart : SimplePlate
     {
-        private void Start()
+        protected override void Start()
         {
+            base.Start();
             _createNextCallback(this);
-        }
-
-        protected override void CheckIfInbound()
-        {
-            Debug.Log("Simple start");
-            base.CheckIfInbound();
         }
     }
 }
