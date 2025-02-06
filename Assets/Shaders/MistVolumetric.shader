@@ -14,6 +14,9 @@ Shader "Custom/MistVolumetric"
         
         [HDR]_LightContribution("Light contribution", Color) = (1, 1, 1, 1)
         _LightScattering("Light scattering", Range(0, 1)) = 0.2
+        
+        _SunSize("Sun size", Range(0, 10)) = 1
+        _SunIntensity("Sun intensity", float) = 1
     }
     
     SubShader
@@ -46,6 +49,9 @@ Shader "Custom/MistVolumetric"
             float4 _LightContribution;
             float _LightScattering;
 
+            float _SunSize;
+            float _SunIntensity;
+
             float henyey_greenstein(float angle, float scattering)
             {
                 return (1.0 - angle * angle) /
@@ -72,25 +78,11 @@ Shader "Custom/MistVolumetric"
                 float3 rayDir= normalize(viewDir);
 
                 float2 pixelCoords = i.texcoord * _BlitTexture_TexelSize.zw;
-                float transmittance = 1;
-                float4 fogColor = _Color;
-
+                float distLimit = min(viewLength, _MaxDistance);
                 float distTravelled = InterleavedGradientNoise(
                     pixelCoords, (int)(_Time.y / max(HALF_EPS, unity_DeltaTime.x))) * _NoiseOffset;
-
-                if (viewLength >= _MaxDistance + distTravelled)
-                {
-                    float3 rayPos = entryPoint + rayDir * _MaxDistance;
-                    Light mainLight = GetMainLight(TransformWorldToShadowCoord(rayPos));
-                        fogColor.rgb += mainLight.color.rgb * _LightContribution.rgb *
-                            henyey_greenstein(dot(rayDir, mainLight.direction), _LightScattering) *
-                                mainLight.shadowAttenuation;
-                    return lerp(color, fogColor, 1.0);
-                }
-                
-                float distLimit = viewLength;
-                // float distTravelled = InterleavedGradientNoise(
-                //     pixelCoords, (int)(_Time.y / max(HALF_EPS, unity_DeltaTime.x))) * _NoiseOffset;
+                float transmittance = 1;
+                float4 fogColor = _Color;
 
                 while (distTravelled < distLimit)
                 {
@@ -99,13 +91,27 @@ Shader "Custom/MistVolumetric"
                     if (density > 0)
                     {
                         Light mainLight = GetMainLight(TransformWorldToShadowCoord(rayPos));
-                        fogColor.rgb += mainLight.color.rgb * _LightContribution.rgb *
-                            henyey_greenstein(dot(rayDir, mainLight.direction), _LightScattering) * density *
-                                mainLight.shadowAttenuation * _StepSize;
-                        transmittance *= exp(-density * _StepSize);
+                        float lightPhase = henyey_greenstein(dot(rayDir, mainLight.direction), _LightScattering);
+                        float lightStrength = mainLight.shadowAttenuation * _StepSize * density;
+
+                        // Apply normal light contribution
+                        fogColor.rgb += mainLight.color.rgb * _LightContribution.rgb * lightPhase * lightStrength;
+
+                        // Ensure the sun itself is visible
+                        float size = 1 - _SunSize * 0.001;
+                        float sunIntensity = max(_SunIntensity, 0);
+                        float sunVisibility = smoothstep(size, 1.0, dot(rayDir, mainLight.direction)); 
+                        fogColor.rgb += mainLight.color.rgb * _LightContribution.rgb * sunVisibility * sunIntensity;
+
+                        transmittance *= exp(-density * _StepSize * (1.0 + distTravelled / _MaxDistance));
                     }
                     
                     distTravelled += _StepSize;
+                }
+
+                if (distTravelled >= _MaxDistance)
+                {
+                    transmittance = 0;
                 }
                 
                 return lerp(color, fogColor, 1.0 - saturate(transmittance));
