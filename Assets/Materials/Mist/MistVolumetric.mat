@@ -36,8 +36,8 @@ Material:
     - _NoiseOffset: 2
     - _NoiseTiling: 5
     - _StepSize: 2
-    - _SunIntensity: 0.3
-    - _SunSize: 1
+    - _SunIntensity: 1
+    - _SunSize: 2
     m_Colors:
     - _Color: {r: 0.5382325, g: 0.504717, b: 1, a: 1}
     - _LightContribution: {r: 1, g: 1, b: 1, a: 1}

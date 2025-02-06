@@ -93,20 +93,22 @@ Shader "Custom/MistVolumetric"
                         Light mainLight = GetMainLight(TransformWorldToShadowCoord(rayPos));
                         float lightPhase = henyey_greenstein(dot(rayDir, mainLight.direction), _LightScattering);
                         float lightStrength = mainLight.shadowAttenuation * _StepSize * density;
-
-                        // Apply normal light contribution
                         fogColor.rgb += mainLight.color.rgb * _LightContribution.rgb * lightPhase * lightStrength;
-
-                        // Ensure the sun itself is visible
-                        float size = 1 - _SunSize * 0.001;
-                        float sunIntensity = max(_SunIntensity, 0);
-                        float sunVisibility = smoothstep(size, 1.0, dot(rayDir, mainLight.direction)); 
-                        fogColor.rgb += mainLight.color.rgb * _LightContribution.rgb * sunVisibility * sunIntensity;
 
                         transmittance *= exp(-density * _StepSize * (1.0 + distTravelled / _MaxDistance));
                     }
                     
                     distTravelled += _StepSize;
+                }
+
+                // Ensure the sun itself is visible
+                if (distTravelled >= _MaxDistance)
+                {
+                    Light mainLight = GetMainLight();
+                    float size = 1 - _SunSize * 0.001;
+                    float sunIntensity = max(_SunIntensity, 0);
+                    float sunVisibility = smoothstep(size, 1.0, dot(rayDir, mainLight.direction)); 
+                    fogColor.rgb += mainLight.color.rgb * _LightContribution.rgb * sunVisibility * sunIntensity;
                 }
 
                 if (distTravelled >= _MaxDistance)
