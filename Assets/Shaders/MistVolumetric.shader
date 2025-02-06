@@ -55,7 +55,7 @@ Shader "Custom/MistVolumetric"
             float henyey_greenstein(float angle, float scattering)
             {
                 return (1.0 - angle * angle) /
-                    (4.0 * PI * pow(1.0 + scattering * scattering - (2.0 * scattering) * angle, 1.5f));
+                    (4.0 * PI * pow(abs(1.0 + scattering * scattering - (2.0 * scattering) * angle), 1.5f));
             }
 
             float get_density(float3 worldPos)
@@ -68,7 +68,7 @@ Shader "Custom/MistVolumetric"
             
             half4 frag(Varyings i) : SV_Target
             {
-                float color = SAMPLE_TEXTURE2D(_BlitTexture, sampler_LinearClamp, i.texcoord);
+                float4 color = SAMPLE_TEXTURE2D(_BlitTexture, sampler_LinearClamp, i.texcoord);
                 float depth = SampleSceneDepth(i.texcoord);
                 float3 worldPos = ComputeWorldSpacePosition(i.texcoord, depth, UNITY_MATRIX_I_VP);
 
@@ -90,6 +90,7 @@ Shader "Custom/MistVolumetric"
                     float density = get_density(rayPos);
                     if (density > 0)
                     {
+                        //Main Light
                         Light mainLight = GetMainLight(TransformWorldToShadowCoord(rayPos));
                         float lightPhase = henyey_greenstein(dot(rayDir, mainLight.direction), _LightScattering);
                         float lightStrength = mainLight.shadowAttenuation * _StepSize * density;
