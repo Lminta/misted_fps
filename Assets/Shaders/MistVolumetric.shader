@@ -72,11 +72,25 @@ Shader "Custom/MistVolumetric"
                 float3 rayDir= normalize(viewDir);
 
                 float2 pixelCoords = i.texcoord * _BlitTexture_TexelSize.zw;
-                float distLimit = min(viewLength, _MaxDistance);
-                float distTravelled = InterleavedGradientNoise(
-                    pixelCoords, (int)(_Time.y / max(HALF_EPS, unity_DeltaTime.x))) * _NoiseOffset;
                 float transmittance = 1;
                 float4 fogColor = _Color;
+
+                float distTravelled = InterleavedGradientNoise(
+                    pixelCoords, (int)(_Time.y / max(HALF_EPS, unity_DeltaTime.x))) * _NoiseOffset;
+
+                if (viewLength >= _MaxDistance + distTravelled)
+                {
+                    float3 rayPos = entryPoint + rayDir * _MaxDistance;
+                    Light mainLight = GetMainLight(TransformWorldToShadowCoord(rayPos));
+                        fogColor.rgb += mainLight.color.rgb * _LightContribution.rgb *
+                            henyey_greenstein(dot(rayDir, mainLight.direction), _LightScattering) *
+                                mainLight.shadowAttenuation;
+                    return lerp(color, fogColor, 1.0);
+                }
+                
+                float distLimit = viewLength;
+                // float distTravelled = InterleavedGradientNoise(
+                //     pixelCoords, (int)(_Time.y / max(HALF_EPS, unity_DeltaTime.x))) * _NoiseOffset;
 
                 while (distTravelled < distLimit)
                 {
