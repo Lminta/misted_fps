@@ -86,6 +86,18 @@ Shader "Custom/MistVolumetric"
                 return density;
             }
 
+            // float get_density(float3 worldPos)
+            // {
+            //     float3 animatedPos = worldPos;
+            //     animatedPos.xz += float2(sin(_Time.y * 0.1), cos(_Time.y * 0.1)) * 5.0; // Slow drift
+            //     animatedPos.y += sin(_Time.y * 0.05) * 2.0; // Vertical wave motion
+            //     
+            //     float4 noise = _FogNoise.SampleLevel(sampler_TrilinearRepeat, animatedPos * 0.01 * _NoiseTiling, 0);
+            //     float density = dot(noise, noise);
+            //     density = saturate(density - _DensityThreshold) * _DensityMultiplier;
+            //     return density;
+            // }
+
             float3 main_light_contribution(Light light, float3 rayDir, float density)
             {
                 float lightPhase = henyey_greenstein(dot(rayDir, light.direction), _LightScattering);
@@ -153,6 +165,10 @@ Shader "Custom/MistVolumetric"
                         fogColor.rgb += additional_light_contribution(IN.texcoord, rayPos, rayDir, density);
                 
                         transmittance *= exp(-density * _StepSize * (1.0 + distTravelled / _MaxDistance));
+                        
+                        //float fadeFactor = 1 - smoothstep(0, _MaxDistance, distTravelled);
+                        // float fadeFactor = max(0, 1 - pow(distTravelled / _MaxDistance, 5));
+                        // transmittance *= exp(-density * _StepSize) * fadeFactor;
                     }
                     
                     distTravelled += _StepSize;
@@ -168,10 +184,10 @@ Shader "Custom/MistVolumetric"
                     fogColor.rgb += mainLight.color.rgb * sunVisibility * sunIntensity;
                 }
                 
-                if (distTravelled >= _MaxDistance)
-                {
-                    transmittance = 0;
-                }
+                // if (distTravelled >= _MaxDistance)
+                // {
+                //     transmittance = 0;
+                // }
                 
                return lerp(color, fogColor, 1.0 - saturate(transmittance));
             }

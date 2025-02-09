@@ -23,6 +23,10 @@ Material:
   m_SavedProperties:
     serializedVersion: 3
     m_TexEnvs:
+    - _BlueNoise:
+        m_Texture: {fileID: 2800000, guid: 8e8b988252a17064fbedfbfaab93db7d, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
     - _FogNoise:
         m_Texture: {fileID: 11700000, guid: 49ced821fcc853a4eb26153df04e5292, type: 2}
         m_Scale: {x: 1, y: 1}
@@ -31,16 +35,17 @@ Material:
     - _MaxAdditionalLightSources: 15
     m_Floats:
     - _AdditionLightScattering: 10
-    - _DensityMultiplier: 0.184
+    - _AdditionalLightScatteringMultiplier: 10
+    - _DensityMultiplier: 0.117
     - _DensityThreshold: 0.942
     - _LightScattering: 0.926
     - _MaxAdditionalLightSources: 3
-    - _MaxDistance: 30
+    - _MaxDistance: 50
     - _NoiseOffset: 2
     - _NoiseTiling: 5
     - _StepSize: 2
-    - _SunIntensity: 1
-    - _SunSize: 2
+    - _SunIntensity: 12.14
+    - _SunSize: 1.46
     m_Colors:
     - _Color: {r: 0.6808473, g: 0.8597268, b: 0.9433962, a: 1}
     - _LightContribution: {r: 1, g: 1, b: 1, a: 1}
